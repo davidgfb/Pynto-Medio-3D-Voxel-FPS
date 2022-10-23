@@ -88,14 +88,16 @@ while run:
         d = {'X' : {keypress[K_d] : -1, keypress[K_a] : 1},\
              'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}
 
-        for c in d:          
-            for e in d[c]:
+        for c in d:
+            t = d[c]
+            
+            for e in t:                
                 if e:
                     if c == 'X':
-                        x = d[c][e]
+                        x = t[e]
 
                     if c == 'Z':
-                        z = d[c][e]
+                        z = t[e]
 
         glTranslatef(*array((x, y, z)) / 10)
 
