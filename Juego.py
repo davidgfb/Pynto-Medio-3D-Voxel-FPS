@@ -4,7 +4,8 @@ from pygame.locals import *
 from pygame.display import set_mode
 from pygame.event import get
 from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
-                   K_p, MOUSEMOTION
+                   K_p, MOUSEMOTION, K_w, K_s, K_d, K_a
+from pygame.key import get_pressed
 
 from OpenGL.GL import *
 from OpenGL.GL import glEnable
@@ -17,84 +18,86 @@ displayCenter = array(set_mode(display, 1073741826).get_size())\
                 // 2
 
 init()
-
 tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
                      GL_COLOR_MATERIAL, GL_LIGHT0))) #opc
-
 glShadeModel(GL_SMOOTH)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
-
-tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT, array(((1,) * 3 + (2,))) / 2),\
+tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT,\
+                               array(((1,) * 3 + (2,))) / 2),\
        (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
 
-'''a = array(((GL_LIGHT0, GL_AMBIENT, array(((1,) * 3 + (2,))) / 2),\
-       (GL_LIGHT0, GL_DIFFUSE, (1,) * 4)))
-b, c = a
-
-tuple(map(glLightfv, *(a[:, i] for i in range(len(b))))) #map desordena'''
-
-sphere = gluNewQuadric() 
+sphere = gluNewQuadric()
+w, h = display
 
 glMatrixMode(GL_PROJECTION)
-w, h = display
 gluPerspective(45, w / h, 0.1, 50)
 
 glMatrixMode(GL_MODELVIEW)
-gluLookAt(0, -8, 0, 0, 0, 0, 0, 0, 1)
+gluLookAt(*((0, -8,) + (0,) * 6 + (1,)))
+
 viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
+
 glLoadIdentity()
 
 # init mouse movement and center mouse on screen
 
-mouseMove = [0, 0]
+mouseMove, up_down_angle, paused, run = [0, 0], 0, False, True
+
 set_pos(displayCenter)
 set_visible(False)
 
-up_down_angle, paused, run = 0, False, True
-
 while run:
     for event in get():
-        if event.type == QUIT:
+        if event.type == QUIT or\
+           (event.type == KEYDOWN and\
+            (event.key == K_ESCAPE or event.key == K_RETURN)):
             run = False
 
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE or event.key == K_RETURN:
-                run = False
-            if event.key == K_PAUSE or event.key == K_p:
-                paused = not paused
-                set_pos(displayCenter) 
+        if event.type == KEYDOWN and\
+           (event.key == K_PAUSE or event.key == K_p):
+            paused = not paused
+            set_pos(displayCenter)
 
         if not paused: 
             if event.type == MOUSEMOTION:
                 mouseMove = event.pos - displayCenter
                 
-            set_pos(displayCenter)    
+            set_pos(displayCenter)
 
     if not paused:
         # get keys
-        keypress = pygame.key.get_pressed()
+        keypress = get_pressed()
         #mouseMove = pygame.mouse.get_rel()
     
         # init model view matrix
         glLoadIdentity()
 
         # apply the look up and down
-        up_down_angle += mouseMove[1]*0.1
-        glRotatef(up_down_angle, 1.0, 0.0, 0.0)
+        x, y = mouseMove
+        up_down_angle += y / 10
+
+        glRotatef(up_down_angle, 1, 0, 0)
 
         # init the view matrix
         glPushMatrix()
         glLoadIdentity()
 
+        x, y, z = 0, 0, 0
+
         # apply the movment 
-        if keypress[pygame.K_w]:
-            glTranslatef(0,0,0.1)
-        if keypress[pygame.K_s]:
-            glTranslatef(0,0,-0.1)
-        if keypress[pygame.K_d]:
-            glTranslatef(-0.1,0,0)
-        if keypress[pygame.K_a]:
-            glTranslatef(0.1,0,0)
+        if keypress[K_w]:
+            z = 0.1
+
+        if keypress[K_s]:
+            z = -0.1
+
+        if keypress[K_d]:
+            x = -0.1
+
+        if keypress[K_a]:
+            x = 0.1
+
+        glTranslatef(x, y, z)
 
         # apply the left and right rotation
         glRotatef(mouseMove[0]*0.1, 0.0, 1.0, 0.0)
