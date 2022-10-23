@@ -84,11 +84,9 @@ while run:
 
         x, y, z = 0, 0, 0
 
-        # apply the movment
-        d = {'X' : {keypress[K_d] : -1, keypress[K_a] : 1},\
-             'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}
-
-        for c in d:
+        # apply the movment 
+        for c in {'X' : {keypress[K_d] : -1, keypress[K_a] : 1},\
+                  'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}:
             t = d[c]
             
             for e in t:                
