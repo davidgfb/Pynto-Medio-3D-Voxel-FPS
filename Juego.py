@@ -84,23 +84,24 @@ while run:
 
         x, y, z = 0, 0, 0
 
-        # apply the movment 
-        if keypress[K_w]:
-            z = 0.1
+        # apply the movment
+        d = {'X' : {keypress[K_d] : -1, keypress[K_a] : 1},\
+             'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}
 
-        if keypress[K_s]:
-            z = -0.1
+        for c in d:          
+            for e in d[c]:
+                if e:
+                    if c == 'X':
+                        x = d[c][e]
 
-        if keypress[K_d]:
-            x = -0.1
+                    if c == 'Z':
+                        z = d[c][e]
 
-        if keypress[K_a]:
-            x = 0.1
-
-        glTranslatef(x, y, z)
+        glTranslatef(*array((x, y, z)) / 10)
 
         # apply the left and right rotation
-        glRotatef(mouseMove[0]*0.1, 0.0, 1.0, 0.0)
+        x, y = mouseMove
+        glRotatef(x / 10, 0, 1, 0)
 
         # multiply the current matrix by the get the new view matrix and store the final vie matrix 
         glMultMatrixf(viewMatrix)
