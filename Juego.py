@@ -1,11 +1,12 @@
 import pygame
 from pygame.mouse import set_pos, set_visible
 from pygame.locals import *
-from pygame.display import set_mode
+from pygame.display import set_mode, flip
 from pygame.event import get
 from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
-                   K_p, MOUSEMOTION, K_w, K_s, K_d, K_a
+                   K_p, MOUSEMOTION, K_w, K_s, K_d, K_a, quit
 from pygame.key import get_pressed
+from pygame.time import wait
 
 from OpenGL.GL import *
 from OpenGL.GL import glEnable
@@ -47,7 +48,7 @@ set_pos(displayCenter)
 set_visible(False)
 
 while run:
-    for event in get():
+    for event in get(): #dicc
         if event.type == QUIT or\
            (event.type == KEYDOWN and\
             (event.key == K_ESCAPE or event.key == K_RETURN)):
@@ -107,37 +108,33 @@ while run:
 
         # multiply the current matrix by the get the new view matrix and store the final vie matrix 
         glMultMatrixf(viewMatrix)
+
         viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
         # apply view matrix
         glPopMatrix()
         glMultMatrixf(viewMatrix)
 
-        glLightfv(GL_LIGHT0, GL_POSITION, [1, -1, 1, 0])
-
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-
+        glLightfv(GL_LIGHT0, GL_POSITION, (1, -1, 1, 0))
+        glClear(16640)
         glPushMatrix()
-
-        glColor4f(0.5, 0.5, 0.5, 1)
+        glColor4f(*(array(((1,) * 3 + (2,))) / 2))
         glBegin(GL_QUADS)
-        glVertex3f(-10, -10, -2)
-        glVertex3f(10, -10, -2)
-        glVertex3f(10, 10, -2)
-        glVertex3f(-10, 10, -2)
+       
+        tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
+            (-2 * array((-5, 5, 1))), (2 * array((5, 5, -1))),\
+                                       (-2 * array((5, -5, 1))))) #falta set cursor en el centro al ppio
+
         glEnd()
-
         glTranslatef(-1.5, 0, 0)
-        glColor4f(0.5, 0.2, 0.2, 1)
-        gluSphere(sphere, 1.0, 32, 16) 
-
+        glColor4f(*(array((5, 2, 2, 10)) / 10))
+        gluSphere(sphere, 1, 32, 16) 
         glTranslatef(3, 0, 0)
-        glColor4f(0.2, 0.2, 0.5, 1)
-        gluSphere(sphere, 1.0, 32, 16) 
-
+        glColor4f(*(array((2, 2, 5, 10)) / 10))
+        gluSphere(sphere, 1, 32, 16) 
         glPopMatrix()
 
-        pygame.display.flip()
-        pygame.time.wait(10)
+        flip()
+        wait(10)
 
-pygame.quit()
+quit()
