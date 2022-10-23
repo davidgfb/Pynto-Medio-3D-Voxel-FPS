@@ -18,6 +18,10 @@ display = (1280, 720)
 displayCenter = array(set_mode(display, 1073741826).get_size())\
                 // 2
 
+
+set_pos(displayCenter)
+
+
 init()
 tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
                      GL_COLOR_MATERIAL, GL_LIGHT0))) #opc
@@ -44,7 +48,6 @@ glLoadIdentity()
 
 mouseMove, up_down_angle, paused, run = [0, 0], 0, False, True
 
-set_pos(displayCenter)
 set_visible(False)
 
 while run:
@@ -123,7 +126,7 @@ while run:
        
         tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
             (-2 * array((-5, 5, 1))), (2 * array((5, 5, -1))),\
-                                       (-2 * array((5, -5, 1))))) #falta set cursor en el centro al ppio
+                                       (-2 * array((5, -5, 1)))))
 
         glEnd()
         glTranslatef(-1.5, 0, 0)
