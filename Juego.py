@@ -24,8 +24,8 @@ tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
 glShadeModel(GL_SMOOTH)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 
-[glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT, array(((1,) * 3 + (2,))) / 2),\
-       (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))] #opc
+tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT, array(((1,) * 3 + (2,))) / 2),\
+       (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
 
 '''a = array(((GL_LIGHT0, GL_AMBIENT, array(((1,) * 3 + (2,))) / 2),\
        (GL_LIGHT0, GL_DIFFUSE, (1,) * 4)))
