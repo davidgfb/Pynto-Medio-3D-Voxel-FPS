@@ -13,14 +13,63 @@ from OpenGL.GL import GL_DEPTH_TEST, GL_LIGHTING,\
      GL_PROJECTION, GL_MODELVIEW, glGetFloatv,\
      GL_MODELVIEW_MATRIX, glLoadIdentity, glRotatef, glPushMatrix,\
      glTranslatef, glMultMatrixf, glPopMatrix, GL_POSITION,\
-     glClear, glColor4f, glBegin, GL_QUADS, glVertex3f, glEnd
-from OpenGL.GL import glEnable
+     glClear, glColor4f, glBegin, GL_QUADS, glVertex3f, glEnd,\
+     glMaterialfv, GL_FRONT, GL_SPECULAR, glMateriali,\
+     GL_SHININESS, glEnable
 from OpenGL.GLU import gluNewQuadric, gluPerspective, gluLookAt,\
      gluSphere
+from OpenGL.GLUT import glutInit, glutSolidCube
 
 from numpy import array
 
 from time import time
+
+ptos_Linea, pos_Elem = [(0,) * 3, (4,) * 3], 0
+
+def pp(met):
+    glPushMatrix()
+    met()
+    glPopMatrix()
+
+def draw_gun():
+    # Setting up materials, ambient, diffuse, specular and shininess properties are all
+    # different properties of how a material will react in low/high/direct light for
+    # example.
+    ambient_coeffsGray, diffuse_coeffsGray, specular_coeffsGray =\
+                        (*(0.3,) * 3, 1), (*(0.5,) * 3, 1),\
+                        (*(0,) * 3, 1)
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffsGray)
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffsGray)
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffsGray)
+
+    glMateriali(GL_FRONT, GL_SHININESS, 1)
+
+    # OpenGL is very finicky when it comes to transformations, for all of them are global,
+    # so it's good to seperate the transformations which are used to generate the object
+    # from the actual global transformations like animation, movement and such.
+    # The glPushMatrix() ----code----- glPopMatrix() just means that the code in between
+    # these two functions calls is isolated from the rest of your project.
+    # Even inside this push-pop (pp for short) block, we can use nested pp blocks,
+    # which are used to further isolate code in it's entirety.
+    glPushMatrix()
+
+    for pto_Linea in ptos_Linea:
+        x, y, z = pto_Linea
+
+        pp(lambda : (glTranslatef(x, y, z), glutSolidCube(1)))
+  
+    glPopMatrix()
+
+while pos_Elem + 1 < len(ptos_Linea):
+    p_0, p_F = ptos_Linea[pos_Elem : pos_Elem + 2]
+    ptoMedio = tuple((array(p_0) + array(p_F)) // 2)
+ 
+    if ptoMedio in ptos_Linea:
+        pos_Elem += 1
+            
+    else:
+        ptos_Linea.insert(pos_Elem + 1, ptoMedio) #list.insert()
 
 display = (1280, 720)
 displayCenter = array(set_mode(display, 1073741826).get_size())\
@@ -29,13 +78,14 @@ displayCenter = array(set_mode(display, 1073741826).get_size())\
 set_pos(displayCenter)
 set_visible(False)
 init()
+glutInit()
 tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
                      GL_COLOR_MATERIAL, GL_LIGHT0))) #opc
 glShadeModel(GL_SMOOTH)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT,\
-                               array(((1,) * 3 + (2,))) / 2),\
-       (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
+                        array(((1,) * 3 + (2,))) / 2),\
+                        (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
 
 sphere = gluNewQuadric()
 w, h = display
@@ -123,20 +173,17 @@ while run:
         glMultMatrixf(viewMatrix)
         glLightfv(GL_LIGHT0, GL_POSITION, (1, -1, 1, 0))
         glClear(16640)
+
         glPushMatrix()
+
         glColor4f(*(array(((1,) * 3 + (2,))) / 2))
         glBegin(GL_QUADS) 
         tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
             (-2 * array((-5, 5, 1))), (2 * array((5, 5, -1))),\
                                        (-2 * array((5, -5, 1)))))
         glEnd()
-        glTranslatef(-1.5, 0, 0)
-        glColor4f(*(array((5, 2, 2, 10)) / 10))
-        gluSphere(sphere, 1, 32, 16) 
-        glTranslatef(*(array((1, 0, 0)) * 3))
-        glColor4f(*(array((2, 2, 5, 10)) / 10))
-        gluSphere(sphere, 1, 32, 16) 
         glPopMatrix()
+        draw_gun()
         flip()
         wait(5) #cap 144 fps
 
