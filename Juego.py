@@ -1,6 +1,4 @@
-import pygame
 from pygame.mouse import set_pos, set_visible
-from pygame.locals import *
 from pygame.display import set_mode, flip, set_caption
 from pygame.event import get
 from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
@@ -8,9 +6,17 @@ from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
 from pygame.key import get_pressed
 from pygame.time import wait
 
-from OpenGL.GL import *
+from OpenGL.GL import GL_DEPTH_TEST, GL_LIGHTING,\
+     GL_COLOR_MATERIAL, GL_LIGHT0, glShadeModel, GL_SMOOTH,\
+     glColorMaterial, GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,\
+     GL_AMBIENT, GL_DIFFUSE, glLightfv, glMatrixMode,\
+     GL_PROJECTION, GL_MODELVIEW, glGetFloatv,\
+     GL_MODELVIEW_MATRIX, glLoadIdentity, glRotatef, glPushMatrix,\
+     glTranslatef, glMultMatrixf, glPopMatrix, GL_POSITION,\
+     glClear, glColor4f, glBegin, GL_QUADS, glVertex3f, glEnd
 from OpenGL.GL import glEnable
-from OpenGL.GLU import *
+from OpenGL.GLU import gluNewQuadric, gluPerspective, gluLookAt,\
+     gluSphere
 
 from numpy import array
 
