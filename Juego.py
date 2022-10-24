@@ -18,10 +18,7 @@ display = (1280, 720)
 displayCenter = array(set_mode(display, 1073741826).get_size())\
                 // 2
 
-
 set_pos(displayCenter)
-
-
 init()
 tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
                      GL_COLOR_MATERIAL, GL_LIGHT0))) #opc
@@ -75,12 +72,7 @@ while run:
     
         # init model view matrix
         glLoadIdentity()
-
-        # apply the look up and down
-        x, y = mouseMove
-        up_down_angle += y / 10
-
-        glRotatef(up_down_angle, 1, 0, 0)
+        glRotatef(up_down_angle, 1, 0, 0) #inmovil
 
         # init the view matrix
         glPushMatrix()
@@ -103,11 +95,14 @@ while run:
                     if c == 'Z':
                         z = t[e]
 
-        glTranslatef(*array((x, y, z)) / 10)
+        glTranslatef(*array((x, y, z)) / 1000) #v_D
+
+        # apply the look up and down
+        x, y = mouseMove
+        up_down_angle += y / 100 #v_Y
 
         # apply the left and right rotation
-        x, y = mouseMove
-        glRotatef(x / 10, 0, 1, 0)
+        glRotatef(x / 100, 0, 1, 0) #v_X #se repite
 
         # multiply the current matrix by the get the new view matrix and store the final vie matrix 
         glMultMatrixf(viewMatrix)
@@ -136,8 +131,6 @@ while run:
         glColor4f(*(array((2, 2, 5, 10)) / 10))
         gluSphere(sphere, 1, 32, 16) 
         glPopMatrix()
-
         flip()
-        wait(10)
 
 quit()
