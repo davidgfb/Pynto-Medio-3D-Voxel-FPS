@@ -1,8 +1,8 @@
+from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
+                   K_p, MOUSEMOTION, K_w, K_s, K_d, K_a, quit
 from pygame.mouse import set_pos, set_visible
 from pygame.display import set_mode, flip, set_caption
 from pygame.event import get
-from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
-                   K_p, MOUSEMOTION, K_w, K_s, K_d, K_a, quit
 from pygame.key import get_pressed
 from pygame.time import wait
 
