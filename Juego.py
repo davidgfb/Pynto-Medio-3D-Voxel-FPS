@@ -14,11 +14,14 @@ from OpenGL.GLU import *
 
 from numpy import array
 
+from time import time
+
 display = (1280, 720)
 displayCenter = array(set_mode(display, 1073741826).get_size())\
                 // 2
 
 set_pos(displayCenter)
+set_visible(False)
 init()
 tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
                      GL_COLOR_MATERIAL, GL_LIGHT0))) #opc
@@ -32,8 +35,7 @@ sphere = gluNewQuadric()
 w, h = display
 
 glMatrixMode(GL_PROJECTION)
-gluPerspective(45, w / h, 0.1, 50)
-
+gluPerspective(*(array((450, 10 / h * w, 1, 500)) / 10))
 glMatrixMode(GL_MODELVIEW)
 gluLookAt(*((0, -8,) + (0,) * 6 + (1,)))
 
@@ -42,13 +44,8 @@ viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 glLoadIdentity()
 
 # init mouse movement and center mouse on screen
-
-mouseMove, up_down_angle, paused, run = [0, 0], 0, False, True
-
-set_visible(False)
-
-from time import time
-t = time()
+mouseMove, up_down_angle, paused, run, t = [0, 0], 0, False,\
+                                           True, time()
 
 while run:    
     for event in get(): #dicc
@@ -60,14 +57,15 @@ while run:
         if event.type == KEYDOWN and\
            (event.key == K_PAUSE or event.key == K_p):
             paused = not paused
+
+        if event.type == KEYDOWN and\
+           (event.key == K_PAUSE or event.key == K_p) or not paused:
             set_pos(displayCenter)
 
         if not paused: 
             if event.type == MOUSEMOTION:
                 mouseMove = event.pos - displayCenter
                 
-            set_pos(displayCenter)
-
     if not paused:
         # get keys
         keypress = get_pressed()
