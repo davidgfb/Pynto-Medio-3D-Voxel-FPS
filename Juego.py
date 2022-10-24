@@ -39,10 +39,10 @@ def draw_gun():
                         (*(0.3,) * 3, 1), (*(0.5,) * 3, 1),\
                         (*(0,) * 3, 1)
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffsGray)
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffsGray)
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffsGray)
-
+    tuple(glMaterialfv(*a) for a in\
+          ((GL_FRONT, GL_AMBIENT, ambient_coeffsGray),\
+           (GL_FRONT, GL_DIFFUSE, diffuse_coeffsGray),\
+           (GL_FRONT, GL_SPECULAR, specular_coeffsGray))) #opc
     glMateriali(GL_FRONT, GL_SHININESS, 1)
 
     # OpenGL is very finicky when it comes to transformations, for all of them are global,
@@ -173,9 +173,7 @@ while run:
         glMultMatrixf(viewMatrix)
         glLightfv(GL_LIGHT0, GL_POSITION, (1, -1, 1, 0))
         glClear(16640)
-
         glPushMatrix()
-
         glColor4f(*(array(((1,) * 3 + (2,))) / 2))
         glBegin(GL_QUADS) 
         tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
