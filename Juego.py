@@ -1,7 +1,7 @@
 import pygame
 from pygame.mouse import set_pos, set_visible
 from pygame.locals import *
-from pygame.display import set_mode, flip
+from pygame.display import set_mode, flip, set_caption
 from pygame.event import get
 from pygame import init, QUIT, KEYDOWN, K_ESCAPE, K_RETURN, K_PAUSE,\
                    K_p, MOUSEMOTION, K_w, K_s, K_d, K_a, quit
@@ -47,7 +47,10 @@ mouseMove, up_down_angle, paused, run = [0, 0], 0, False, True
 
 set_visible(False)
 
-while run:
+from time import time
+t = time()
+
+while run:    
     for event in get(): #dicc
         if event.type == QUIT or\
            (event.type == KEYDOWN and\
@@ -85,24 +88,26 @@ while run:
              'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}
 
         for c in d:
-            t = d[c]
+            d_C = d[c]
             
-            for e in t:                
+            for e in d_C:                
                 if e:
+                    k_E = d_C[e]
+                    
                     if c == 'X':
-                        x = t[e]
+                        x = k_E
 
                     if c == 'Z':
-                        z = t[e]
+                        z = k_E
 
-        glTranslatef(*array((x, y, z)) / 1000) #v_D
+        glTranslatef(*array((x, y, z)) / 20) #v_D
 
         # apply the look up and down
         x, y = mouseMove
-        up_down_angle += y / 100 #v_Y
+        up_down_angle += y / 10 #v_Y
 
         # apply the left and right rotation
-        glRotatef(x / 100, 0, 1, 0) #v_X #se repite
+        glRotatef(x / 10, 0, 1, 0) #v_X #se repite
 
         # multiply the current matrix by the get the new view matrix and store the final vie matrix 
         glMultMatrixf(viewMatrix)
@@ -112,25 +117,28 @@ while run:
         # apply view matrix
         glPopMatrix()
         glMultMatrixf(viewMatrix)
-
         glLightfv(GL_LIGHT0, GL_POSITION, (1, -1, 1, 0))
         glClear(16640)
         glPushMatrix()
         glColor4f(*(array(((1,) * 3 + (2,))) / 2))
-        glBegin(GL_QUADS)
-       
+        glBegin(GL_QUADS) 
         tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
             (-2 * array((-5, 5, 1))), (2 * array((5, 5, -1))),\
                                        (-2 * array((5, -5, 1)))))
-
         glEnd()
         glTranslatef(-1.5, 0, 0)
         glColor4f(*(array((5, 2, 2, 10)) / 10))
         gluSphere(sphere, 1, 32, 16) 
-        glTranslatef(3, 0, 0)
+        glTranslatef(*(array((1, 0, 0)) * 3))
         glColor4f(*(array((2, 2, 5, 10)) / 10))
         gluSphere(sphere, 1, 32, 16) 
         glPopMatrix()
         flip()
+        wait(5) #cap 144 fps
+
+        if not time() == t:
+            set_caption(str(round(1 / (time() - t))))
+        
+        t = time()
 
 quit()
