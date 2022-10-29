@@ -15,7 +15,7 @@ from OpenGL.GL import GL_DEPTH_TEST, GL_LIGHTING,\
      glTranslatef, glMultMatrixf, glPopMatrix, GL_POSITION,\
      glClear, glColor4f, glBegin, GL_QUADS, glVertex3f, glEnd,\
      glMaterialfv, GL_FRONT, GL_SPECULAR, glMateriali,\
-     GL_SHININESS, glEnable
+     GL_SHININESS, glEnable, glScalef
 from OpenGL.GLU import gluNewQuadric, gluPerspective, gluLookAt,\
      gluSphere
 from OpenGL.GLUT import glutInit, glutSolidCube
@@ -24,7 +24,7 @@ from numpy import array
 
 from time import time
 
-ptos_Linea, pos_Elem = [(0,) * 3, (4,) * 3], 0
+ptos_Linea, pos_Elem = [(1,) * 3, (4,) * 3], 0
 
 def pp(met):
     glPushMatrix()
@@ -52,15 +52,19 @@ def draw_gun():
     # these two functions calls is isolated from the rest of your project.
     # Even inside this push-pop (pp for short) block, we can use nested pp blocks,
     # which are used to further isolate code in it's entirety.
-    glPushMatrix()
-
     for pto_Linea in ptos_Linea:
         x, y, z = pto_Linea
 
         pp(lambda : (glTranslatef(x, y, z), glutSolidCube(1)))
-  
-    glPopMatrix()
 
+    tuple(pp(a) for a in\
+            (lambda : (glTranslatef(*(0, 0, 1)),\
+                       glScalef(*(7, 1, 1)), glutSolidCube(1)),\
+             lambda : (glTranslatef(*(-2, 0, -1)),\
+                       glScalef(*(3, 1, 3)), glutSolidCube(1)),\
+             lambda : (glTranslatef(*(2, 0, -1)),\
+                       glScalef(*(3, 1, 3)), glutSolidCube(1))))
+    
 while pos_Elem + 1 < len(ptos_Linea):
     p_0, p_F = ptos_Linea[pos_Elem : pos_Elem + 2]
     ptoMedio = tuple((array(p_0) + array(p_F)) // 2)
@@ -84,16 +88,16 @@ tuple(map(glEnable, (GL_DEPTH_TEST, GL_LIGHTING,\
 glShadeModel(GL_SMOOTH)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
 tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT,\
-                        array(((1,) * 3 + (2,))) / 2),\
+                        array((1,) * 3 + (2,)) / 2),\
                         (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
 
 sphere = gluNewQuadric()
 w, h = display
 
 glMatrixMode(GL_PROJECTION)
-gluPerspective(*(array((450, 10 / h * w, 1, 500)) / 10))
+gluPerspective(*array((450, 10 / h * w, 1, 500)) / 10)
 glMatrixMode(GL_MODELVIEW)
-gluLookAt(*((0, -8,) + (0,) * 6 + (1,)))
+gluLookAt(*(0, -8,) + (0,) * 6 + (1,))
 
 viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
