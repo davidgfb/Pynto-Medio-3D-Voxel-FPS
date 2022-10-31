@@ -16,15 +16,14 @@ from OpenGL.GL import GL_DEPTH_TEST, GL_LIGHTING,\
      glClear, glColor4f, glBegin, GL_QUADS, glVertex3f, glEnd,\
      glMaterialfv, GL_FRONT, GL_SPECULAR, glMateriali,\
      GL_SHININESS, glEnable, glScalef
-from OpenGL.GLU import gluNewQuadric, gluPerspective, gluLookAt,\
-     gluSphere
+from OpenGL.GLU import gluPerspective, gluLookAt
 from OpenGL.GLUT import glutInit, glutSolidCube
 
 from numpy import array
 
 from time import time
 
-ptos_Linea, pos_Elem = [(1,) * 3, (4,) * 3], 0
+ptos_Linea, pos_Elem = [(1,) * 3, (400,) * 3], 0
 
 def pp(met):
     glPushMatrix()
@@ -43,7 +42,7 @@ def draw_gun():
           ((GL_FRONT, GL_AMBIENT, ambient_coeffsGray),\
            (GL_FRONT, GL_DIFFUSE, diffuse_coeffsGray),\
            (GL_FRONT, GL_SPECULAR, specular_coeffsGray))) #opc
-    glMateriali(GL_FRONT, GL_SHININESS, 1)
+    glMateriali(GL_FRONT, GL_SHININESS, 1) #opc
 
     # OpenGL is very finicky when it comes to transformations, for all of them are global,
     # so it's good to seperate the transformations which are used to generate the object
@@ -57,13 +56,18 @@ def draw_gun():
 
         pp(lambda : (glTranslatef(x, y, z), glutSolidCube(1)))
 
+    s = 100
+    
     tuple(pp(a) for a in\
-            (lambda : (glTranslatef(*(0, 0, 1)),\
-                       glScalef(*(7, 1, 1)), glutSolidCube(1)),\
-             lambda : (glTranslatef(*(-2, 0, -1)),\
-                       glScalef(*(3, 1, 3)), glutSolidCube(1)),\
-             lambda : (glTranslatef(*(2, 0, -1)),\
-                       glScalef(*(3, 1, 3)), glutSolidCube(1))))
+            (lambda : (glTranslatef(*s * array((0, 0, 2))),\
+                       glScalef(*s * array((7, 1, 1))),\
+                       glutSolidCube(1)),\
+             lambda : (glTranslatef(*s * array((-2, 0, 0))),\
+                       glScalef(*s * array((3, 1, 3))),\
+                       glutSolidCube(1)),\
+             lambda : (glTranslatef(*s * array((2, 0, 0))),\
+                       glScalef(*s * array((3, 1, 3))),\
+                       glutSolidCube(1))))
     
 while pos_Elem + 1 < len(ptos_Linea):
     p_0, p_F = ptos_Linea[pos_Elem : pos_Elem + 2]
@@ -91,13 +95,12 @@ tuple(glLightfv(*a) for a in ((GL_LIGHT0, GL_AMBIENT,\
                         array((1,) * 3 + (2,)) / 2),\
                         (GL_LIGHT0, GL_DIFFUSE, (1,) * 4))) #opc
 
-sphere = gluNewQuadric()
-w, h = display
+(w, h), z = display, 100
 
 glMatrixMode(GL_PROJECTION)
-gluPerspective(*array((450, 10 / h * w, 1, 500)) / 10)
+gluPerspective(*array((450, 10 / h * w, 1, 1e4)) / 10)
 glMatrixMode(GL_MODELVIEW)
-gluLookAt(*(0, -8,) + (0,) * 6 + (1,))
+gluLookAt(*(0, -z, z, 0, 0, z, 0, 0, 1)) #*(0, -8, 10,) + (0,) * 5 + (1,))
 
 viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
@@ -139,11 +142,12 @@ while run:
         glPushMatrix()
         glLoadIdentity()
 
-        x, y, z = 0, 0, 0
+        x, y, z, v = 0, 0, 0, 10
 
+        
         # apply the movment
-        d = {'X' : {keypress[K_d] : -1, keypress[K_a] : 1},\
-             'Z' : {keypress[K_w] : 1, keypress[K_s] : -1}}
+        d = {'X' : {keypress[K_d] : -v, keypress[K_a] : v},\
+             'Z' : {keypress[K_w] : v, keypress[K_s] : -v}}
 
         for c in d:
             d_C = d[c]
@@ -155,7 +159,7 @@ while run:
                     if c == 'X':
                         x = k_E
 
-                    if c == 'Z':
+                    elif c == 'Z':
                         z = k_E
 
         glTranslatef(*array((x, y, z)) / 20) #v_D
@@ -178,13 +182,12 @@ while run:
         glLightfv(GL_LIGHT0, GL_POSITION, (1, -1, 1, 0))
         glClear(16640)
         glPushMatrix()
-        glColor4f(*(array(((1,) * 3 + (2,))) / 2))
+        glColor4f(*array(((1,) * 3 + (2,))) / 2)
         glBegin(GL_QUADS) 
-        tuple(glVertex3f(*a) for a in ((-2 * array((5, 5, 1))),\
-            (-2 * array((-5, 5, 1))), (2 * array((5, 5, -1))),\
-                                       (-2 * array((5, -5, 1)))))
         glEnd()
         glPopMatrix()
+        pp(lambda : (glScalef(*(700, 700, 1)),\
+                     glutSolidCube(1))) #suelo
         draw_gun()
         flip()
         wait(5) #cap 144 fps
